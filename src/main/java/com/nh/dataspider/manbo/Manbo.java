@@ -28,9 +28,9 @@ public class Manbo {
 
 		 try {
 //			 String radioDramaSetId = "1646390531103653974";
-			 String radioDramaId = "1682292446198759476";
+			 String radioDramaId = "1710494425529974854";
 			 boolean onlyLrc = true;
-			 int start = 24;
+			 int start = 16;
 			 boolean downList = true;
 			 
 			 String orgName = "[莘羽]";
@@ -363,6 +363,8 @@ public class Manbo {
 			 String fileName = prepareLrcName(title, "", manboDramaSet.getSetTitle());
 			 
 			 fileName += lrcUrl.substring(lrcUrl.lastIndexOf("."), lrcUrl.length());
+			 
+			 fileName = fileName.replaceAll("\"", "");
 
 			 DataSpiderUtil.down(lrcUrl, downloadPath+"lrc"+orgNamem+"/", fileName);
 		 }

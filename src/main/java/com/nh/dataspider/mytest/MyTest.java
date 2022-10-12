@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigDecimal;
@@ -29,6 +28,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.mpatric.mp3agic.ID3v2;
 import com.mpatric.mp3agic.Mp3File;
+import com.nh.dataspider.audio.ConvertingAnyAudioToMp3_Example1;
 import com.nh.dataspider.pay.model.AlipayResponseModel;
 import com.nh.dataspider.pay.model.AlipayResponseModel.PassbackParams;
 import com.nh.dataspider.util.Base64Util;
@@ -37,6 +37,12 @@ import com.nh.dataspider.util.NumberUtil;
 
 import cn.hutool.json.JSONArray;
 import lombok.Data;
+import ws.schild.jave.Encoder;
+import ws.schild.jave.EncoderException;
+import ws.schild.jave.InputFormatException;
+import ws.schild.jave.MultimediaObject;
+import ws.schild.jave.encode.AudioAttributes;
+import ws.schild.jave.encode.EncodingAttributes;
 
 /**
  * @author ：nh
@@ -46,16 +52,19 @@ import lombok.Data;
 public class MyTest {
 	
 	public static void main(String[] args) {
-		String filePath = "C:\\Users\\CES\\Downloads\\第2季";
-		String album = "老婆粉了解一下 第二季";
-		String albumArtist = "晋江文学城 春刀寒 原著，猫耳FM出品，张凯工作室配音，广播剧《老婆粉了解一下》";
-		String artist = "吴晛&李诗萌";
-		String comment = "『我独唯，不爬墙。』";
+		String filePath = "C:\\Users\\CES\\Downloads\\test";
+		String transPath = "C:\\Users\\CES\\Downloads\\test\\trans";
+		String album = "﻿﻿﻿﻿﻿你是什么垃圾 全一季";
+		String titlePrefix = "你是什么垃圾";
+		String albumArtist = "﻿﻿﻿﻿﻿﻿长佩文学张佩奇原著，漫播APP携手TME、9号小街工作室、支枕工作室 联合出品，全一季广播剧《你是什么垃圾》";
+		String artist = "﻿歪歪&大昕";
+		String comment = "﻿同学，你是什么垃圾？";
 		String coverType = "jpg";
-//		reNameTitle(filePath);
+//		reNameTitle(filePath, titlePrefix);
 //		reName(filePath); 
-		modifyProperty(filePath, album, albumArtist, artist, comment, coverType);
-//		reSetProperty(filePath, album, albumArtist, artist, comment, coverType);
+//		modifyProperty(filePath, album, albumArtist, artist, comment, coverType);
+		fillProperty(filePath, transPath, album, titlePrefix, albumArtist, artist, comment);
+//		reSetProperty(filePath, album, titlePrefix, albumArtist, artist, comment);
 		
 //		try {
 //			testOut();
@@ -459,6 +468,8 @@ public class MyTest {
 		System.out.println(1/100);
 		double total_amount = new BigDecimal(1).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP).doubleValue();
 		System.out.println("total_amount="+total_amount);
+		
+		System.out.println("checkNumeric="+NumberUtil.checkNumeric("01"));
 	}
 	
 	public static void writeObject() {
@@ -828,7 +839,7 @@ public class MyTest {
 		}
 	}
 	
-	private static void reNameTitle(String filePath) {
+	private static void reNameTitle(String filePath, String album) {
 
 		try {
 			File file = new File(filePath);
@@ -863,6 +874,11 @@ public class MyTest {
 		                    if(title.indexOf("[")>0) {
 		                    	title = title.substring(0, title.indexOf("[")).trim();
 		                    }
+		                    if(NumberUtil.checkNumeric(name.substring(0, name.lastIndexOf("."))+"")) {
+	                    		title = album+" "+"第"+name.substring(0, name.lastIndexOf("."))+""+"集";
+	                    	}else {
+	                    		title = album+" "+name.substring(0, name.lastIndexOf("."));
+	                    	}
 		                    
 		                    id3v2Tag.setTitle(title);
 	                    }
@@ -968,7 +984,119 @@ public class MyTest {
 		}
 	}
 	
-	private static void reSetProperty(String filePath, String album, String albumArtist, String artist, String comment, String coverType) {
+	public static boolean changeToMp3(String sourcePath, String targetPath) {
+		File source = new File(sourcePath);
+		File target = new File(targetPath);
+		AudioAttributes audio = new AudioAttributes();
+		Encoder encoder = new Encoder();
+ 
+		audio.setCodec("libmp3lame");
+		EncodingAttributes attrs = new EncodingAttributes();
+		attrs.setOutputFormat("mp3");
+		attrs.setAudioAttributes(audio);
+ 
+		try {
+			encoder.encode(new MultimediaObject(source), target, attrs);
+			return true;
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return false;
+		} catch (InputFormatException e) {
+			e.printStackTrace();
+			return false;
+		} catch (EncoderException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private static void fillProperty(String filePath, String transPath, String album, String titlePrefix, String albumArtist, String artist, String comment) {
+		try {
+			File file = new File(filePath);
+			File[] fileArray = file.listFiles();
+	        if (fileArray == null) {
+	            System.out.println("no file");
+	        } else {
+	            for (File f : fileArray) {
+	            	if(f.isFile()&&(f.getName().indexOf("mp3")>0 || f.getName().indexOf("m4a")>0)) {
+	            		String name = f.getName();
+	            		if(name.indexOf("【")>0) {
+		            		name = name.substring(0, name.indexOf("【"))+name.substring(name.lastIndexOf("."),name.length());
+		            	}
+		            	
+		            	if(name.indexOf("[")>0) {
+		            		name = name.substring(0, name.indexOf("["))+name.substring(name.lastIndexOf("."),name.length());
+		            	}
+		            	
+		            	if(name.indexOf("微信公众号")>0) {
+		            		name = name.replace("微信公众号FM小屋", "");
+		            		name = name.replace("微信公众号  FM小屋", "");
+		            		name = name.replace("微信公众号 FM小屋", "");
+		            	}
+	            		String targetPath = transPath + "\\" +name.substring(0, name.lastIndexOf("."))+".mp3";
+//	            		if(changeToMp3(f.getAbsolutePath(), targetPath)) {
+//	            			if (f.exists() && f.isFile()) {
+//		                        f.delete();
+//		                    }
+//	            		}
+	            		ConvertingAnyAudioToMp3_Example1.convertingAnyAudioToMp3(f.getAbsolutePath(), targetPath);
+	            		if (f.exists() && f.isFile()) {
+	                        f.delete();
+	                    }
+	            	} else if(f.isFile()&&f.getName().indexOf("mp4")>0) {
+	            		reName(filePath);
+	            	}
+	            }
+	        }
+	        
+	        file = new File(transPath);
+			fileArray = file.listFiles();
+	        if (fileArray == null) {
+	            System.out.println("no file");
+	        } else {
+	        	Mp3File mp3file = null;
+	            for (File f : fileArray) {
+
+	            	if(f.isFile()&&f.getName().indexOf("mp3")>0) {
+	            		String name = f.getName();
+	            		mp3file = new Mp3File(f);
+	                    ID3v2 id3v2Tag = mp3file.getId3v2Tag();
+	                    if(id3v2Tag != null) {
+	                    	String title = titlePrefix+" "+ name.substring(0, name.lastIndexOf("."))+"";
+	                    	if(NumberUtil.checkNumeric(name.substring(0, name.lastIndexOf("."))+"")) {
+	                    		title = titlePrefix+" "+ "第"+name.substring(0, name.lastIndexOf("."))+""+"集";
+	                    	}
+	                    	id3v2Tag.setTitle(title);
+		                	id3v2Tag.setAlbum(album);
+		                	id3v2Tag.setAlbumArtist(albumArtist);
+		                	id3v2Tag.setArtist(artist);
+		                	id3v2Tag.setComment(comment);
+		                	
+		                	String targetPath = filePath+filePath.substring(filePath.lastIndexOf(File.separator), filePath.length());
+		                	File targetF = new File(targetPath);
+		                    if (!targetF.exists()) {
+		                    	targetF.mkdir();
+		                    }
+		                	mp3file.save(targetPath+"\\"+name);
+		                	
+		                	if (f.exists() && f.isFile()) {
+		                        f.delete();
+		                    }
+	                    }
+
+	            	} else if(f.isFile()&&f.getName().indexOf("mp4")>0) {
+	            		reName(filePath);
+	            	}
+	            }
+	        }
+	        System.out.println("rename success");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private static void reSetProperty(String filePath, String album, String titlePrefix, String albumArtist, String artist, String comment) {
 		try {
 			File file = new File(filePath);
 			File[] fileArray = file.listFiles();
@@ -977,9 +1105,10 @@ public class MyTest {
 	        } else {
 	        	Mp3File mp3file = null;
 	            for (File f : fileArray) {
-
-	            	if(f.isFile()) {
+	            	
+	            	if(f.isFile()&&f.getName().indexOf("mp3")>0) {
 	            		String name = f.getName();
+	            		
 		            	if(name.indexOf("【")>0) {
 		            		name = name.substring(0, name.indexOf("【"))+name.substring(name.lastIndexOf("."),name.length());
 		            	}
@@ -993,35 +1122,34 @@ public class MyTest {
 		            		name = name.replace("微信公众号  FM小屋", "");
 		            		name = name.replace("微信公众号 FM小屋", "");
 		            	}
-		            	
-	                    mp3file = new Mp3File(f);
+	            		
+	            		mp3file = new Mp3File(f);
 	                    ID3v2 id3v2Tag = mp3file.getId3v2Tag();
 	                    if(id3v2Tag != null) {
-		                    id3v2Tag.setTitle(album + " 第"+ name.substring(0, name.lastIndexOf("."))+"集");
-//		                    id3v2Tag.setTitle(album + " "+ name.substring(0, name.lastIndexOf("."))+"");
+	                    	String title = titlePrefix+" "+ name.substring(0, name.lastIndexOf("."))+"";
+	                    	if(NumberUtil.checkNumeric(name.substring(0, name.lastIndexOf("."))+"")) {
+	                    		title = titlePrefix+" "+ "第"+name.substring(0, name.lastIndexOf("."))+""+"集";
+	                    	}
+	                    	id3v2Tag.setTitle(title);
 		                	id3v2Tag.setAlbum(album);
 		                	id3v2Tag.setAlbumArtist(albumArtist);
 		                	id3v2Tag.setArtist(artist);
 		                	id3v2Tag.setComment(comment);
-		                	RandomAccessFile cover = new RandomAccessFile(filePath+File.separator+"cover"+File.separator+"cover."+coverType, "r");
-		                	byte[] bytes = new byte[(int) file.length()];
-		                	cover.read(bytes);
-		                	cover.close();
-		                	id3v2Tag.setAlbumImage(bytes, "image/"+coverType);
+		                	
 		                	String targetPath = filePath+filePath.substring(filePath.lastIndexOf(File.separator), filePath.length());
 		                	File targetF = new File(targetPath);
 		                    if (!targetF.exists()) {
 		                    	targetF.mkdir();
 		                    }
 		                	mp3file.save(targetPath+"\\"+name);
-		                    
-//		                	File rf = new File(filePath+"\\"+name);
-//			            	rf.renameTo(nf);
-		                    
+		                	
 		                	if (f.exists() && f.isFile()) {
-		                		f.delete();
+		                        f.delete();
 		                    }
 	                    }
+
+	            	} else if(f.isFile()&&f.getName().indexOf("mp4")>0) {
+	            		reName(filePath);
 	            	}
 	            }
 	        }

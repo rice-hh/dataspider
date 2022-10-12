@@ -26,9 +26,9 @@ public class MissEvan {
 	
 	public static void main(String[] args) {
 		 try {
-			 String sountId = "5713708";//5575430
+			 String sountId = "5780624";//5575430
 			 boolean onlyLrc = true;
-			 int start = 1;
+			 int start = 9;
 			 boolean downList = true;
 			 boolean isList = true;
 			 String orgName = "[南硕]";
