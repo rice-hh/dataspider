@@ -33,6 +33,7 @@ import com.nh.dataspider.pay.model.AlipayResponseModel;
 import com.nh.dataspider.pay.model.AlipayResponseModel.PassbackParams;
 import com.nh.dataspider.util.Base64Util;
 import com.nh.dataspider.util.DateUtil;
+import com.nh.dataspider.util.FileUtil;
 import com.nh.dataspider.util.NumberUtil;
 
 import cn.hutool.json.JSONArray;
@@ -54,16 +55,16 @@ public class MyTest {
 	public static void main(String[] args) {
 		String filePath = "C:\\Users\\CES\\Downloads\\test";
 		String transPath = "C:\\Users\\CES\\Downloads\\test\\trans";
-		String album = "﻿﻿﻿﻿﻿你是什么垃圾 全一季";
-		String titlePrefix = "你是什么垃圾";
-		String albumArtist = "﻿﻿﻿﻿﻿﻿长佩文学张佩奇原著，漫播APP携手TME、9号小街工作室、支枕工作室 联合出品，全一季广播剧《你是什么垃圾》";
-		String artist = "﻿歪歪&大昕";
-		String comment = "﻿同学，你是什么垃圾？";
+		String album = "危险人格 第二季";
+		String titlePrefix = "江湖那么大";
+		String albumArtist = "晋江文学城 木瓜黄原著，猫耳FM出品，玉苍红独家制作，广播剧《危险人格》";
+		String artist = "景向谁依&倒霉死勒";
+		String comment = "我相信你。解临你记住，不管发生什么，我永远相信你。";
 		String coverType = "jpg";
-//		reNameTitle(filePath, titlePrefix);
+		reNameTitle(filePath, titlePrefix);
 //		reName(filePath); 
 //		modifyProperty(filePath, album, albumArtist, artist, comment, coverType);
-		fillProperty(filePath, transPath, album, titlePrefix, albumArtist, artist, comment);
+//		fillProperty(filePath, transPath, album, titlePrefix, albumArtist, artist, comment);
 //		reSetProperty(filePath, album, titlePrefix, albumArtist, artist, comment);
 		
 //		try {
@@ -470,7 +471,28 @@ public class MyTest {
 		System.out.println("total_amount="+total_amount);
 		
 		System.out.println("checkNumeric="+NumberUtil.checkNumeric("01"));
+		
+		List<String> ls1 = Lists.newArrayList();
+		ls1.add("1");
+		ls1.add("2");
+		ls1.add("3");
+		ls1.add("4");
+		System.out.println("listToString="+listToString(ls1));
 	}
+	
+	public static String listToString(List<String> strL) {
+    	StringBuffer sb = new StringBuffer();
+    	if(strL != null && strL.size()>0) {
+            for (int i = 0; i < strL.size(); i++) {
+                if (i == 0) {
+                    sb.append("'").append(strL.get(i)).append("'");
+                } else {
+                    sb.append(",").append("'").append(strL.get(i)).append("'");
+                }
+            }
+        }
+        return sb.toString();
+    }
 	
 	public static void writeObject() {
 		TestOrder u = new TestOrder("9龙", "23");
@@ -883,7 +905,11 @@ public class MyTest {
 		                    id3v2Tag.setTitle(title);
 	                    }
 	                    
-	                	String targetPath = filePath+filePath.substring(filePath.lastIndexOf(File.separator), filePath.length());
+	                    String targetPath = filePath+filePath.substring(filePath.lastIndexOf(File.separator), filePath.length());
+		            	//检查目标路径下，name是否已经存在
+		            	if(FileUtil.fileIsFile(targetPath+"\\"+name)) {
+		            		name = album+"-"+name;
+		            	}
 	                	File targetF = new File(targetPath);
 	                    if (!targetF.exists()) {
 	                    	targetF.mkdir();
@@ -1033,6 +1059,7 @@ public class MyTest {
 		            		name = name.replace("微信公众号  FM小屋", "");
 		            		name = name.replace("微信公众号 FM小屋", "");
 		            	}
+		            	
 	            		String targetPath = transPath + "\\" +name.substring(0, name.lastIndexOf("."))+".mp3";
 //	            		if(changeToMp3(f.getAbsolutePath(), targetPath)) {
 //	            			if (f.exists() && f.isFile()) {
