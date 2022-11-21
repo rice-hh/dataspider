@@ -18,6 +18,13 @@
 		<java.version>11</java.version>
 	</properties>
 	
+	<repositories>
+		<repository>
+			<id>huaweicloud</id>
+			<url>https://mirrors.huaweicloud.com/repository/maven/huaweicloudsdk/</url>
+		</repository>
+	</repositories>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -174,6 +181,27 @@
 		    <artifactId>jave-nativebin-win64</artifactId>
 		    <version>3.3.1</version>
 		</dependency>
+		
+		<!-- 华为huawei -->
+		<dependency>
+		    <groupId>com.huaweicloud.sdk</groupId>
+		    <artifactId>huaweicloud-sdk-core</artifactId>
+		    <version>3.1.6</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.huaweicloud.sdk</groupId>
+		    <artifactId>huaweicloud-sdk-ocr</artifactId>
+		    <version>3.1.6</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.huawei.hwclouds.ais/ais-java-client -->
+		<!-- <dependency>
+            <groupId>com.huawei.ais</groupId>
+            <artifactId>ais-java-client</artifactId>
+            <version>2.0.0</version>
+            <systemPath>${basedir}/src/main/resources/lib/ais-java-client-2.0.0.jar</systemPath>
+        </dependency> -->
 		
 		<!--企业微信依赖-->
         <dependency>
