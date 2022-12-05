@@ -5,7 +5,7 @@ public class AesException extends Exception {
 
 	public final static int OK = 0;
 	public final static int ValidateSignatureError = -40001;
-	public final static int ParseJsonError = -40002;
+	public final static int ParseXmlError = -40002;
 	public final static int ComputeSignatureError = -40003;
 	public final static int IllegalAesKey = -40004;
 	public final static int ValidateCorpidError = -40005;
@@ -15,6 +15,7 @@ public class AesException extends Exception {
 	public final static int EncodeBase64Error = -40009;
 	public final static int DecodeBase64Error = -40010;
 	public final static int GenReturnJsonError = -40011;
+	public final static int ParseJsonError = -40012;
 
 	private int code;
 
@@ -22,7 +23,7 @@ public class AesException extends Exception {
 		switch (code) {
 		case ValidateSignatureError:
 			return "签名验证错误";
-		case ParseJsonError:
+		case ParseXmlError:
 			return "json解析失败";
 		case ComputeSignatureError:
 			return "sha加密生成签名失败";
@@ -42,6 +43,8 @@ public class AesException extends Exception {
 			return "base64解密错误";
 		case GenReturnJsonError:
 			return "josn生成失败";
+		case ParseJsonError:
+			return "json解析失败";
 		default:
 			return null; // cannot be
 		}
