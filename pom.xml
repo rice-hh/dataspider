@@ -49,6 +49,14 @@
 		</dependency>
 		
 		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>3.0.2</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+		
+		<dependency>
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpclient</artifactId>
 		    <version>4.5.13</version>
@@ -199,6 +207,13 @@
 		    <artifactId>huaweicloud-sdk-ocr</artifactId>
 		    <version>3.1.6</version>
 		</dependency>
+		
+		<!-- 字段验证 -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+        </dependency>
 		
 		<!-- https://mvnrepository.com/artifact/com.huawei.hwclouds.ais/ais-java-client -->
 		<!-- <dependency>

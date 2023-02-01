@@ -14,12 +14,15 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -52,19 +55,19 @@ import ws.schild.jave.encode.EncodingAttributes;
  */
 public class MyTest {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		String filePath = "C:\\Users\\CES\\Downloads\\test";
 		String transPath = "C:\\Users\\CES\\Downloads\\test\\trans";
-		String album = "危险人格 第二季";
-		String titlePrefix = "江湖那么大";
-		String albumArtist = "晋江文学城 木瓜黄原著，猫耳FM出品，玉苍红独家制作，广播剧《危险人格》";
-		String artist = "景向谁依&倒霉死勒";
-		String comment = "我相信你。解临你记住，不管发生什么，我永远相信你。";
+		String album = "琢玉 第一季";
+		String titlePrefix = "琢玉 第一季";
+		String albumArtist = "晋江文学城墨书白原著，漫播APP携手声意文化联合出品，广播剧《琢玉》";
+		String artist = "马正阳&孙路路";
+		String comment = "人如玉。当琢而得之，死生百痛，方得玉成。";
 		String coverType = "jpg";
-		reNameTitle(filePath, titlePrefix);
+//		reNameTitle(filePath, titlePrefix);
 //		reName(filePath); 
 //		modifyProperty(filePath, album, albumArtist, artist, comment, coverType);
-//		fillProperty(filePath, transPath, album, titlePrefix, albumArtist, artist, comment);
+		fillProperty(filePath, transPath, album, titlePrefix, albumArtist, artist, comment);
 //		reSetProperty(filePath, album, titlePrefix, albumArtist, artist, comment);
 		
 //		try {
@@ -478,6 +481,31 @@ public class MyTest {
 		ls1.add("3");
 		ls1.add("4");
 		System.out.println("listToString="+listToString(ls1));
+		
+		BigDecimal addBalacesB = new BigDecimal(2.1);
+    	BigDecimal accountBalancesB = new BigDecimal(-1.2);
+    	BigDecimal resultAmounct = addBalacesB.add(accountBalancesB);
+    	double accountBalances = new BigDecimal(String.valueOf(resultAmounct)).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+    	System.out.println("accountBalances="+accountBalances);
+    	
+    	TClass t = new TClass();
+    	t.setStr("222");
+    	System.out.println(t.getStr());
+    	
+		List<String> existDeptIdL = Lists.newArrayList();
+		existDeptIdL.add(null);
+		existDeptIdL.add(null);
+		System.out.println("listToString="+listToString(existDeptIdL));
+		existDeptIdL.remove(null);
+		System.out.println("listToString2="+listToString(existDeptIdL));
+		existDeptIdL = existDeptIdL.stream().filter(l -> l != null).collect(Collectors.toList());
+		System.out.println("listToString3="+listToString(existDeptIdL));
+		
+	}
+	
+	@Data
+	public static class TClass{
+		private String str;
 	}
 	
 	public static String listToString(List<String> strL) {
@@ -1044,7 +1072,7 @@ public class MyTest {
 	            System.out.println("no file");
 	        } else {
 	            for (File f : fileArray) {
-	            	if(f.isFile()&&(f.getName().indexOf("mp3")>0 || f.getName().indexOf("m4a")>0)) {
+	            	if(f.isFile()&&(f.getName().indexOf("mp3")>0 || f.getName().indexOf("m4a")>0 || f.getName().indexOf("flac")>0)) {
 	            		String name = f.getName();
 	            		if(name.indexOf("【")>0) {
 		            		name = name.substring(0, name.indexOf("【"))+name.substring(name.lastIndexOf("."),name.length());
@@ -1100,6 +1128,12 @@ public class MyTest {
 		                	id3v2Tag.setComment(comment);
 		                	
 		                	String targetPath = filePath+filePath.substring(filePath.lastIndexOf(File.separator), filePath.length());
+			            	//检查目标路径下，name是否已经存在
+			            	if(FileUtil.fileIsFile(targetPath+"\\"+name)) {
+			            		name = album+"-"+name;
+			            	}
+		                	mp3file.save(targetPath+"\\"+name);
+		                	
 		                	File targetF = new File(targetPath);
 		                    if (!targetF.exists()) {
 		                    	targetF.mkdir();

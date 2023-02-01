@@ -63,9 +63,9 @@ public class WxWorkController {
 //	@Autowired
 //    private UserProvider userProvider;
 
-	@Value("${wxwork_config.domain_url}")
+//	@Value("${wxwork_config.domain_url}")
     private String domainUrl;
-	@Value("${wxwork_config.suite_id}")
+//	@Value("${wxwork_config.suite_id}")
     private String suiteId;
 
 //    @ApiOperation("企业微信 验证回调URL")

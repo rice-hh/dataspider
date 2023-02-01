@@ -26,9 +26,9 @@ public class MissEvan {
 	
 	public static void main(String[] args) {
 		 try {
-			 String sountId = "5780624";//5575430
+			 String sountId = "7058125";//
 			 boolean onlyLrc = true;
-			 int start = 9;
+			 int start = 1;
 			 boolean downList = true;
 			 boolean isList = true;
 			 String orgName = "[南硕]";
@@ -429,7 +429,7 @@ public class MissEvan {
 		 
 		 dirName = dirName.replace(" ", "");
 		 
-		 String downloadPath = "G:/nh/mymissevandown/"+DateUtil.getCurrentYear()+"/"+DateUtil.getCurrentMonthDay()+"/"+dirName+"/";
+		 String downloadPath = "G:/nh/man&missevan/"+DateUtil.getCurrentYear()+"/"+DateUtil.getCurrentMonthDay()+"/"+dirName+"/";
 //		 System.out.println("===========音频文件下载start=============");
 //		 downMp(downloadPath, fileName, mSound);
 //		 System.out.println("===========音频文件下载success=============");

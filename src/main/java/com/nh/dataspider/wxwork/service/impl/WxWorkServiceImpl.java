@@ -46,7 +46,7 @@ import com.nh.dataspider.wxwork.util.WXBizMsgCrypt;
 @Service
 public class WxWorkServiceImpl implements IWxWorkService {
 
-    @Autowired
+//    @Autowired
 //    private RedisUtil redisUtil;
 //    @Autowired
 //    protected TenantApi tenantApi;
@@ -59,19 +59,19 @@ public class WxWorkServiceImpl implements IWxWorkService {
 //    @Autowired
 //    private AccountService accountService;
 
-    @Value("${wxwork_config.suite_id}")
+//    @Value("${wxwork_config.suite_id}")
     private String suiteId;
-    @Value("${wxwork_config.suite_secret}")
+//    @Value("${wxwork_config.suite_secret}")
     private String suiteSecret;
-    @Value("${wxwork_config.stoken}")
+//    @Value("${wxwork_config.stoken}")
     private String stoken;
-    @Value("${wxwork_config.sencoding_aeskey}")
+//    @Value("${wxwork_config.sencoding_aeskey}")
     private String sencodingAeskey;
-    @Value("${wxwork_config.domain_url}")
+//    @Value("${wxwork_config.domain_url}")
     private String domainUrl;
-    @Value("${wxwork_config.session_auth_type}")
+//    @Value("${wxwork_config.session_auth_type}")
     private String session_auth_type;
-    @Value("${wxwork_config.template_id}")
+//    @Value("${wxwork_config.template_id}")
     private String templateId;
 
     //企业微信相关信息存在redis中的key的公共前缀

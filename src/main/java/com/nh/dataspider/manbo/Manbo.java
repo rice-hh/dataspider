@@ -28,9 +28,9 @@ public class Manbo {
 
 		 try {
 //			 String radioDramaSetId = "1646390531103653974";
-			 String radioDramaId = "1710494425529974854";
+			 String radioDramaId = "1768011429262131230";
 			 boolean onlyLrc = true;
-			 int start = 16;
+			 int start = 1;
 			 boolean downList = true;
 			 
 			 String orgName = "[莘羽]";
@@ -230,12 +230,12 @@ public class Manbo {
 		 
 		 String downloadPath = "";
 		 if(onlyLrc) {
-			 downloadPath = "G:/nh/mymanbodown/"+DateUtil.getCurrentYear()+"/"+DateUtil.getCurrentMonthDay()+"/"+title+"/";
+			 downloadPath = "G:/nh/man&missevan/"+DateUtil.getCurrentYear()+"/"+DateUtil.getCurrentMonthDay()+"/"+title+"/";
 		 }else {
 			 fileName = prepareFileName(title, orgName, manboDramaSet.getSetTitle());
 			 
 			 fileName = fileName.substring(fileName.lastIndexOf("]")+1, fileName.length());
-			 downloadPath = "G:/nh/mymanbodown/"+DateUtil.getCurrentYear()+"/"+DateUtil.getCurrentMonthDay()+"/"+title+"/"+"/"+fileName+"/";
+			 downloadPath = "G:/nh/man&missevan/"+DateUtil.getCurrentYear()+"/"+DateUtil.getCurrentMonthDay()+"/"+title+"/"+"/"+fileName+"/";
 		 }
 		 
 //		 System.out.println("===========音频文件下载start=============");
@@ -365,7 +365,7 @@ public class Manbo {
 			 fileName += lrcUrl.substring(lrcUrl.lastIndexOf("."), lrcUrl.length());
 			 
 			 fileName = fileName.replaceAll("\"", "");
-
+			 
 			 DataSpiderUtil.down(lrcUrl, downloadPath+"lrc"+orgNamem+"/", fileName);
 		 }
 	 }
