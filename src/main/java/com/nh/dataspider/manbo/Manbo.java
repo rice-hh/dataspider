@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -24,13 +25,56 @@ import com.nh.dataspider.util.NumberUtil;
 
 public class Manbo {
 	
+	public void downLrc(String soundId, int start) {
+		try {
+			 boolean onlyLrc = true;
+			 boolean downList = true;
+			 
+			 ManboDrama manboDrama = getManboDrama(soundId);
+			 
+			 getManboDramaSet(manboDrama, soundId, start, downList, onlyLrc);
+			 
+			 System.out.println("downloadlrc success！！");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void downLrc(String soundId) {
+		try {
+			 String excelFilePath = "H:\\广播剧\\商剧\\config.xls";
+			 ManboDrama manboDrama = getManboDrama(soundId);
+			 
+			 if(manboDrama != null) {
+				 List<ManboDramaSet> setRespList = manboDrama.getSetRespList();
+				 if(setRespList != null && setRespList.size()>0) {
+					 String downloadPath = "";
+					 for(int i=1; i<setRespList.size(); i++) {
+						 String lrcUrl = setRespList.get(i).getSetLrcUrl();
+						 if(!lrcUrl.isEmpty()) {
+							 String lrcName = prepareLrcName(manboDrama.getTitle(), "", setRespList.get(i).getSetTitle());
+							 if(!DataSpiderUtil.checkFileExistByExcel(soundId, lrcName, excelFilePath)) {
+								 downloadPath = "G:/nh/man&missevan/"+DateUtil.getCurrentYear()+"/"+DateUtil.getCurrentMonthDay()+"/"+manboDrama.getTitle()+"/";
+								 DataSpiderUtil.down(lrcUrl, downloadPath+"lrc"+soundId+"/", lrcName+".lrc");
+							 }
+						 }
+						 
+					 }
+				 }
+			 }
+			 System.out.println("downloadlrc success！！");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) {
 
 		 try {
-//			 String radioDramaSetId = "1646390531103653974";
+//			 String radioDramaSetId = "1766190436143071280";
 			 String radioDramaId = "1768011429262131230";
 			 boolean onlyLrc = true;
-			 int start = 1;
+			 int start = 22;
 			 boolean downList = true;
 			 
 			 String orgName = "[莘羽]";
@@ -178,6 +222,10 @@ public class Manbo {
 		 
 		 String dirName = "";
 		 System.out.println("name="+name);
+		 if(name.startsWith("「")) {
+			 name = name.replace("「", "");
+			 name = name.replace("」", "");
+		 }
 //		 if(name.contains("第")) {
 		 if(name.indexOf("第")==0) {
 			 
@@ -187,11 +235,15 @@ public class Manbo {
 			 char [] ch = name.toCharArray();
 			 int i=-1;
 			 boolean isChineseNum = false;
+			 boolean isCapitalChineseNum = false;
 			 for (char c : ch) {
 				 i++;
 				 if(i==1) {
 					 if(NumberUtil.isChineseNum(String.valueOf(c))) {
 						 isChineseNum = true;
+					 }
+					 if(NumberUtil.isCapitalChineseNum(String.valueOf(c))) {
+						 isCapitalChineseNum = true;
 					 }
 				 }
 				 if(!NumberUtil.isNum(String.valueOf(c)) && i>1) {
@@ -200,6 +252,8 @@ public class Manbo {
 			 }
 			 if(isChineseNum) {
 				 arabicNum = NumberUtil.chineseNumToArabicNum(name.substring(1,name.length()-1));
+			 }else if(isCapitalChineseNum) {
+				 arabicNum = NumberUtil.capitalChineseNumToArabicNum(name.substring(1,name.length()-1));
 			 }else {
 				 arabicNum = Integer.parseInt(name.substring(1,i));
 			 }
@@ -211,15 +265,21 @@ public class Manbo {
 			 if(name.contains("集")) {
 				 lastIndex = name.indexOf("集");
 			 }
+			 if(name.contains("回")) {
+				 lastIndex = name.indexOf("回");
+			 }
 			 
 			 if(arabicNum < 10) {
 				 dirName = "0"+arabicNum;
 			 }else {
 				 dirName = arabicNum+"";
 			 }
+			 dirName = dirName+name.substring(lastIndex+1,name.length());
 		 }else {
 			 dirName = name;
 		 }
+		 
+		 dirName = dirName.replaceAll("\\*", "");
 		 
 		 return orgName+dirName;
 	 }
@@ -365,6 +425,9 @@ public class Manbo {
 			 fileName += lrcUrl.substring(lrcUrl.lastIndexOf("."), lrcUrl.length());
 			 
 			 fileName = fileName.replaceAll("\"", "");
+			 fileName = fileName.replaceAll("/", "-");
+			 
+//			 fileName = "主题曲";
 			 
 			 DataSpiderUtil.down(lrcUrl, downloadPath+"lrc"+orgNamem+"/", fileName);
 		 }

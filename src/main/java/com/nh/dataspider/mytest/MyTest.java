@@ -15,16 +15,34 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.crypto.Cipher;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
 
 import com.alibaba.fastjson.JSONObject;
@@ -36,8 +54,12 @@ import com.nh.dataspider.pay.model.AlipayResponseModel;
 import com.nh.dataspider.pay.model.AlipayResponseModel.PassbackParams;
 import com.nh.dataspider.util.Base64Util;
 import com.nh.dataspider.util.DateUtil;
+import com.nh.dataspider.util.DesUtil;
 import com.nh.dataspider.util.FileUtil;
+import com.nh.dataspider.util.LunarToSolar;
+import com.nh.dataspider.util.Md5Util;
 import com.nh.dataspider.util.NumberUtil;
+import com.nh.dataspider.util.Sh1Util;
 
 import cn.hutool.json.JSONArray;
 import lombok.Data;
@@ -58,18 +80,18 @@ public class MyTest {
 	public static void main(String[] args) throws Exception {
 		String filePath = "C:\\Users\\CES\\Downloads\\test";
 		String transPath = "C:\\Users\\CES\\Downloads\\test\\trans";
-		String album = "琢玉 第一季";
-		String titlePrefix = "琢玉 第一季";
-		String albumArtist = "晋江文学城墨书白原著，漫播APP携手声意文化联合出品，广播剧《琢玉》";
-		String artist = "马正阳&孙路路";
-		String comment = "人如玉。当琢而得之，死生百痛，方得玉成。";
+		String album = "我成了虐文女主她亲哥 第一季";
+		String titlePrefix = "我成了虐文女主她亲哥 第一季";
+		String albumArtist = "爱奇艺小说之欢原著，漫播app出品，希音工作室制作，全一季广播剧《被迫联姻后我真香了》";
+		String artist = "埃文&月白在搬砖";
+		String comment = "【年下总裁VS新晋演员，ABO】黄嘉宜：戏演完了，请你离我远一点！罗嘉言：没关系，反正我们明天在媒体前还要继续演。";
 		String coverType = "jpg";
 //		reNameTitle(filePath, titlePrefix);
 //		reName(filePath); 
 //		modifyProperty(filePath, album, albumArtist, artist, comment, coverType);
 		fillProperty(filePath, transPath, album, titlePrefix, albumArtist, artist, comment);
 //		reSetProperty(filePath, album, titlePrefix, albumArtist, artist, comment);
-		
+		 
 //		try {
 //			testOut();
 //		} catch (IOException e) {
@@ -501,7 +523,217 @@ public class MyTest {
 		existDeptIdL = existDeptIdL.stream().filter(l -> l != null).collect(Collectors.toList());
 		System.out.println("listToString3="+listToString(existDeptIdL));
 		
+		String sss= "{'dateField106':-993974400000.0}";
+		JSONObject jso = new JSONObject();
+		jso.put("dateField106", -993974400000.0);
+		JSONObject jsonObject = JSONObject.parseObject(sss);
+		System.out.println(jsonObject.toJSONString());
+		Map<String, Object> dataMap = JSONObject.parseObject(jso.toJSONString(), Map.class);
+		System.out.println(dataMap);
+		
+		Date date = new Date();
+		long lDate = DateUtil.stringToDate(DateUtil.dateFormat(date)).getTime();
+		System.out.println("lDate="+lDate);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		System.out.println("1679673600000="+sdf.format(Long.parseLong("1679673600000")));
+		
+		String sDate = DateUtil.toString(date, "yyyy-MM-dd HH:mm");
+		System.out.println("sDate="+sDate);
+		
+		System.out.println(LunarToSolar.lunarToSolar("2023-2-2"));
+		
+		DateTimeFormatter ftf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		String value="-714214800000";
+//		value="-1679673600000";
+		 BigDecimal db = new BigDecimal(value);
+         String ii = db.toPlainString();
+         long time = Long.parseLong(ii);
+         String result = ftf.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.of("+8")));
+         System.out.println("result="+result);
+         String result2 = ftf.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault()));
+         System.out.println("result2="+result2);
+         System.out.println("value="+sdf.format(Long.parseLong(value)));
+         
+         String sps = "/api/visualdev/OnlineDev/{modelId}/List";
+         List<String> funSplit = funSplit(sps);
+         for(String f : funSplit) {
+        	 System.out.println(f);
+        	 sps = sps.replace(f, "***");
+         }
+         System.out.println("sps="+sps);
+         String sps1 = "/api/visualdev/OnlineDev/{modelId}/{viewId}/List/{viewId}";
+         funSplit = funSplit(sps1);
+         for(String f : funSplit) {
+        	 System.out.println(f);
+        	 sps1 = sps1.replace(f, "***");
+         }
+         System.out.println("sps1="+sps1);
+         
+//         String secret = getCharAndNumr(16);
+//         System.out.println("secret="+secret);
+//         String uid = getUid();
+//         System.out.println("uid="+Md5Util.getStringMd5(uid));
+         
+//         String id = getUid();
+//     	 String clientId = getCharAndNumr(16);
+//     	 String clientSecret = Md5Util.getStringMd5(clientId.toLowerCase() + id.toLowerCase());
+//     	 System.out.println("clientSecret="+clientSecret);
+//     	 System.out.println("clientSecret2="+DesUtil.md5(clientId, id));
+//     	 Map<Integer, String> keyMap = genKeyPair();
+//     	 System.out.println("keyMap.get(0)="+keyMap.get(0));
+//     	 System.out.println("keyMap.get(1)="+keyMap.get(0));
+//     	 System.out.println("clientSecret3="+Base64.getEncoder().encodeToString(clientId.getBytes()));
+//     	System.out.println("clientSecret4="+DigestUtils.md5Hex(clientId.getBytes()).toUpperCase());
+//     	System.out.println("clientSecret5="+Sh1Util.getSha1(clientId));
+//     	System.out.println("clientSecret6="+getRSAEncrypt(clientId));
+         
+         String nn = "* 屋内的月光 *";
+         nn = nn.replaceAll("\\*", "");
+         System.out.println(nn);
 	}
+	
+	public static String getRSAEncrypt(String str) {
+		try {
+			Map<Integer, String> keyMap = new HashMap<Integer, String>();
+	        // KeyPairGenerator类用于生成公钥和私钥对，基于RSA算法生成对象
+	        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
+	        // 初始化密钥对生成器
+	        keyPairGen.initialize(512, new SecureRandom());
+	        // 生成一个密钥对，保存在keyPair中
+	        KeyPair keyPair = keyPairGen.generateKeyPair();
+	        // 得到私钥
+	        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+	        // 得到公钥
+	        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+	        String publicKeyString = java.util.Base64.getEncoder().encodeToString(publicKey.getEncoded());
+	        // 得到私钥字符串
+	        String privateKeyString = java.util.Base64.getEncoder().encodeToString(privateKey.getEncoded());
+	        // 将公钥和私钥保存到Map
+	        //0表示公钥
+	        keyMap.put(0, publicKeyString);
+	        //1表示私钥
+	        keyMap.put(1, privateKeyString);
+			
+	        //base64编码的公钥
+	        byte[] decoded = java.util.Base64.getDecoder().decode(publicKeyString);
+	        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(decoded));
+	        //RSA加密
+	        Cipher cipher = Cipher.getInstance("RSA");
+	        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+	        String outStr = java.util.Base64.getEncoder().encodeToString(cipher.doFinal(str.getBytes("UTF-8")));
+	        return outStr;
+		} catch (Exception e) {
+			 e.printStackTrace();
+        }
+        return null;
+    }
+	
+	public static Map<Integer, String> genKeyPair() throws NoSuchAlgorithmException, IOException {
+		Map<Integer, String> keyMap = new HashMap<Integer, String>();
+        // KeyPairGenerator类用于生成公钥和私钥对，基于RSA算法生成对象
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
+        // 初始化密钥对生成器
+        keyPairGen.initialize(512, new SecureRandom());
+        // 生成一个密钥对，保存在keyPair中
+        KeyPair keyPair = keyPairGen.generateKeyPair();
+        // 得到私钥
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        // 得到公钥
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+        // 得到私钥字符串
+        String privateKeyString = Base64.getEncoder().encodeToString(privateKey.getEncoded());
+        // 将公钥和私钥保存到Map
+        //0表示公钥
+        keyMap.put(0, publicKeyString);
+        //1表示私钥
+        keyMap.put(1, privateKeyString);
+        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("PubKey.key"));
+        osw.write(publicKeyString);
+        osw.flush();
+        osw.close();
+        OutputStreamWriter osw2 = new OutputStreamWriter(new FileOutputStream("PriKey.key"));
+        osw2.write(privateKeyString);
+        osw2.flush();
+        osw2.close();
+        return keyMap;
+    }
+	
+	public static String encrypt(String str, String publicKey) throws Exception {
+        //base64编码的公钥
+        byte[] decoded = Base64.getDecoder().decode(publicKey);
+        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(decoded));
+        //RSA加密
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+        String outStr = Base64.getEncoder().encodeToString(cipher.doFinal(str.getBytes("UTF-8")));
+        return outStr;
+    }
+	
+	public static String getUid(){
+		StringBuffer sb = new StringBuffer();
+		
+		long id=(long)((Math.random()*9+1)*100000);
+		String num = String.format("%06d", id);
+		sb.append(num);
+		SimpleDateFormat df = new SimpleDateFormat("yyMMddHHmm");
+		sb.append(df.format(new Date()));
+		Random random = new Random();
+		sb.append(random.nextInt(100)+10);
+		return sb.toString();
+	}
+	
+//	public static String getKey(String uid){
+//		String key = SMS.md5(uid);
+//		return key;
+//	}
+	
+	public static String getCharAndNumr(int length)     
+	{     
+	    String val = "";     
+	             
+	    Random random = new Random();     
+	    for(int i = 0; i < length; i++)     
+	    {     
+	        String charOrNum = random.nextInt(2) % 2 == 0 ? "char" : "num"; // 输出字母还是数字     
+	                 
+	        if("char".equalsIgnoreCase(charOrNum)) // 字符串     
+	        {     
+	            int choice = random.nextInt(2) % 2 == 0 ? 65 : 97; //取得大写字母还是小写字母     
+	            val += (char) (choice + random.nextInt(26));     
+	        }     
+	        else if("num".equalsIgnoreCase(charOrNum)) // 数字     
+	        {     
+	            val += String.valueOf(random.nextInt(10));     
+	        }     
+	    }     
+	             
+	    return val;     
+	}
+
+	
+	public static List<String> funSplit(String functionStr){
+        List<String> list = new ArrayList<>();
+        int startFlag = 0;
+        int endFlag = 0;
+        int subStart = 0;
+        int len = functionStr.length();
+        for (int i = 0; i < len; i++) {
+            if (functionStr.charAt(i) == '{') {
+                startFlag++;
+                if (startFlag == endFlag + 1) {
+                    subStart = i;
+                }
+            } else if (functionStr.charAt(i) == '}') {
+                endFlag++;
+                if (endFlag == startFlag) {
+                    list.add(functionStr.substring(subStart, i + 1));
+                }
+            }
+        }
+        return list;
+    }
 	
 	@Data
 	public static class TClass{
@@ -1072,7 +1304,7 @@ public class MyTest {
 	            System.out.println("no file");
 	        } else {
 	            for (File f : fileArray) {
-	            	if(f.isFile()&&(f.getName().indexOf("mp3")>0 || f.getName().indexOf("m4a")>0 || f.getName().indexOf("flac")>0)) {
+	            	if(f.isFile()&&(f.getName().indexOf("mp3")>0 || f.getName().indexOf("m4a")>0 || f.getName().indexOf("flac")>0 || f.getName().indexOf("wav")>0)) {
 	            		String name = f.getName();
 	            		if(name.indexOf("【")>0) {
 		            		name = name.substring(0, name.indexOf("【"))+name.substring(name.lastIndexOf("."),name.length());
@@ -1250,6 +1482,7 @@ public class MyTest {
 		Writer out1 = new BufferedWriter(new OutputStreamWriter(System.out));
 		
 		System.out.println("write success");
+		
 	}
 }
 

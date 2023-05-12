@@ -20,6 +20,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
@@ -293,5 +298,38 @@ public class DataSpiderUtil {
 		 if(tempFile.isFile() && tempFile.exists()) {
 			 tempFile.delete();
 		 }
+	}
+	
+	public static boolean checkFileExistByExcel(String id, String lrcName, String excelFilePath) {
+		boolean exist = true;
+		try {
+			Workbook workbook = FileUtil.getUploadExcelWorkbook(excelFilePath);
+			FormulaEvaluator evaluator=workbook.getCreationHelper().createFormulaEvaluator();
+			Sheet sheet = workbook.getSheetAt(0);
+			
+			int rows = sheet.getLastRowNum();
+			if(rows>0) {
+				for(int i=1; i<=rows; i++) {
+					Row row = sheet.getRow(i);
+					if(row != null) {
+						Cell cell = row.getCell(0);
+						String excelId = FileUtil.readCellValue(cell, evaluator);
+						if(excelId.equals(id)) {
+							cell = row.getCell(1);
+							String excelPath = FileUtil.readCellValue(cell, evaluator);
+							if(FileUtil.fileIsExists(excelPath+"\\"+lrcName+".lrc")) {
+								exist = true;
+							}else {
+								exist = false;
+							}
+							break;
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return exist;
 	}
 }

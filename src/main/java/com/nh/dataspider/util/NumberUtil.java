@@ -6,7 +6,10 @@ public class NumberUtil {
 	
 	static char[] cnArr = new char [] {'一','二','三','四','五','六','七','八','九'};
 	static char[] chArr = new char [] {'十','百','千','万','亿'};
+	static char[] capitalCnArr = new char [] {'壹','贰','叁','肆','伍','陆','柒','捌','玖'};
+	static char[] capitalChArr = new char [] {'拾','佰','仟','万','亿'};
 	static String allChineseNum = "零一二三四五六七八九十百千万亿";
+	static String allCapitalChineseNum = "零壹贰叁肆伍陆柒捌玖拾佰仟万亿";
 
 	/**
 	 * 将汉字中的数字转换为阿拉伯数字
@@ -36,6 +39,64 @@ public class NumberUtil {
             if(b){//单位{'十','百','千','万','亿'}
                 for (int j = 0; j < chArr.length; j++) {
                     if (c == chArr[j]) {
+                        switch (j) {
+                        case 0:
+                            temp *= 10;
+                            break;
+                        case 1:
+                            temp *= 100;
+                            break;
+                        case 2:
+                            temp *= 1000;
+                            break;
+                        case 3:
+                            temp *= 10000;
+                            break;
+                        case 4:
+                            temp *= 100000000;
+                            break;
+                        default:
+                            break;
+                        }
+                        count++;
+                    }
+                }
+            }
+            if (i == chineseNum.length() - 1) {//遍历到最后一个字符
+                result += temp;
+            }
+        }
+        return result;
+	}
+	
+	/**
+	 * 将汉字中的数字转换为阿拉伯数字
+	 * @param chineseNum
+	 * @return
+	 */
+	public static int capitalChineseNumToArabicNum(String chineseNum) {
+        int result = 0;
+        int temp = 1;//存放一个单位的数字如：十万
+        int count = 0;//判断是否有chArr
+        for (int i = 0; i < chineseNum.length(); i++) {
+            boolean b = true;//判断是否是chArr
+            char c = chineseNum.charAt(i);
+            for (int j = 0; j < capitalCnArr.length; j++) {//非单位，即数字
+                if (c == capitalCnArr[j]) {
+                    if(0 != count){//添加下一个单位之前，先把上一个单位值添加到结果中
+                        result += temp;
+                        temp = 1;
+                        count = 0;
+                    }
+                    // 下标+1，就是对应的值
+                    temp = j + 1;
+                    b = false;
+                    break;
+                }
+            }
+            if(b){//单位{'拾','佰','仟','万','亿'}
+                for (int j = 0; j < capitalChArr.length; j++) {
+                    if (c == capitalChArr[j]) {
                         switch (j) {
                         case 0:
                             temp *= 10;
@@ -131,6 +192,21 @@ public class NumberUtil {
 		char [] ch = chineseStr.toCharArray();
 		for (char c : ch) {
 			if (!allChineseNum.contains(String.valueOf(c))) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * 判断传入的字符串是否全是汉字大写数字
+	 * @param chineseStr
+	 * @return
+	 */
+	public static boolean isCapitalChineseNum(String chineseStr) {
+		char [] ch = chineseStr.toCharArray();
+		for (char c : ch) {
+			if (!allCapitalChineseNum.contains(String.valueOf(c))) {
 				return false;
 			}
 		}

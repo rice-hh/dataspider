@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -20,15 +25,84 @@ import com.nh.dataspider.missevan.model.MissEvanDrama;
 import com.nh.dataspider.missevan.model.MissEvanSound;
 import com.nh.dataspider.util.DataSpiderUtil;
 import com.nh.dataspider.util.DateUtil;
+import com.nh.dataspider.util.FileUtil;
 import com.nh.dataspider.util.NumberUtil;
 
 public class MissEvan {
 	
+	public void downLrc(String soundId, int start) {
+		try {
+			 Map<String, List<MissEvanDrama>> reMap = getMaoerDrama(soundId);
+			 List<MissEvanDrama> episodesList = reMap.get("episode");
+			 List<MissEvanDrama> musicList = reMap.get("music");
+			 List<MissEvanDrama> ftList = reMap.get("ft");
+			 if(episodesList != null && episodesList.size()>0) {
+				 for(int i=start-1; i<episodesList.size();i++) {
+					 prepareDownLrc(episodesList.get(i), soundId);
+				 }
+			 }
+			 
+			 if(musicList != null && musicList.size()>0) {
+				 for(int i=0; i<musicList.size();i++) {
+					 prepareDownLrc(musicList.get(i), soundId);
+				 }
+			 }
+			 
+			 if(ftList != null && ftList.size()>0) {
+				 for(int i=0; i<ftList.size();i++) {
+					 prepareDownLrc(ftList.get(i), soundId);
+				 }
+			 }
+			 
+			 System.out.println("downloadlrc success！！");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void downLrc(String soundId) {
+		try {
+			 String excelFilePath = "H:\\广播剧\\商剧\\config.xls";
+			 Map<String, List<MissEvanDrama>> reMap = getMaoerDrama(soundId);
+			 List<MissEvanDrama> episodesList = reMap.get("episode");
+			 List<MissEvanDrama> musicList = reMap.get("music");
+			 List<MissEvanDrama> ftList = reMap.get("ft");
+			 if(episodesList != null && episodesList.size()>0) {
+				 for(int i=0; i<episodesList.size();i++) {
+					 String lrcName = prepareDownLrcName(episodesList.get(i));
+					 if(!DataSpiderUtil.checkFileExistByExcel(soundId, lrcName, excelFilePath)) {
+						 getMissEvanSound(episodesList.get(i).getSound_id(), episodesList.get(i).getDramaName()+"/lrc"+soundId, lrcName);
+					 }
+				 }
+			 }
+			 
+			 if(musicList != null && musicList.size()>0) {
+				 for(int i=0; i<musicList.size();i++) {
+					 String lrcName = prepareDownLrcName(musicList.get(i));
+					 if(!DataSpiderUtil.checkFileExistByExcel(soundId, lrcName, excelFilePath)) {
+						 getMissEvanSound(musicList.get(i).getSound_id(), musicList.get(i).getDramaName()+"/lrc"+soundId, lrcName);
+					 }
+				 }
+			 }
+			 
+			 if(ftList != null && ftList.size()>0) {
+				 for(int i=0; i<ftList.size();i++) {
+					 String lrcName = prepareDownLrcName(ftList.get(i));
+					 if(!DataSpiderUtil.checkFileExistByExcel(soundId, lrcName, excelFilePath)) {
+						 getMissEvanSound(ftList.get(i).getSound_id(), ftList.get(i).getDramaName()+"/lrc"+soundId, lrcName);
+					 }
+				 }
+			 }
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
 	public static void main(String[] args) {
 		 try {
-			 String sountId = "7058125";//
+			 String sountId = "7181612";//
 			 boolean onlyLrc = true;
-			 int start = 1;
+			 int start = 19;
 			 boolean downList = true;
 			 boolean isList = true;
 			 String orgName = "[南硕]";
@@ -89,11 +163,55 @@ public class MissEvan {
 		}
 	}
 	
-	public static void prepareDownLrc (MissEvanDrama l, String sountId) throws Exception {
+//	public static void prepareDownLrc (MissEvanDrama l, String sountId) throws Exception {
+//		 
+//		 String soundId = l.getSound_id();
+//		 String dirName = ""; 
+//		 String fileName = "";
+//		 
+//		 String name = l.getName();
+//		 System.out.println("name="+name);
+//		 name = name.replaceAll("第二季·", "");
+//		 name = name.replaceAll("第二季", "");
+//		 if(name.contains("第")) {
+//			 
+//			 int arabicNum = NumberUtil.chineseNumToArabicNum(name.substring(1,name.length()-1));
+//			 
+//			 int lastIndex = l.getName().length()-1;
+//			 if(l.getName().contains("期")) {
+//				 lastIndex = l.getName().indexOf("期");
+//			 }
+//			 if(l.getName().contains("集")) {
+//				 lastIndex = l.getName().indexOf("集");
+//			 }
+//			 
+//			 if(arabicNum < 10) {
+//				 dirName = "0"+arabicNum;
+//			 }else {
+//				 dirName = arabicNum+"";
+//			 }
+//		 }else {
+//			 dirName = l.getName();
+//			 dirName = dirName.replace("|", "");
+//		 }
+//		 
+//		 dirName = dirName.replace(" ", "");
+//		 dirName = dirName.replace("<", "《");
+//		 dirName = dirName.replace(">", "》");
+//		 
+//		 getMissEvanSound(soundId, l.getDramaName()+"/lrc"+sountId, dirName);
+//	 }
+	
+	public static void prepareDownLrc (MissEvanDrama l, String soundId) throws Exception {
 		 
-		 String soundId = l.getSound_id();
-		 String dirName = "";
-		 String fileName = "";
+		 String dirName = prepareDownLrcName(l);
+		 
+		 getMissEvanSound(l.getSound_id(), l.getDramaName()+"/lrc"+soundId, dirName);
+	 }
+	
+	public static String prepareDownLrcName (MissEvanDrama l) throws Exception {
+		 
+		 String dirName = ""; 
 		 
 		 String name = l.getName();
 		 System.out.println("name="+name);
@@ -116,16 +234,21 @@ public class MissEvan {
 			 }else {
 				 dirName = arabicNum+"";
 			 }
+			 dirName = dirName+name.substring(lastIndex+1,name.length());
 		 }else {
 			 dirName = l.getName();
 			 dirName = dirName.replace("|", "");
 		 }
 		 
-		 dirName = dirName.replace(" ", "");
+//		 dirName = dirName.replace(" ", "");
 		 dirName = dirName.replace("<", "《");
 		 dirName = dirName.replace(">", "》");
+		 if(dirName.startsWith("「")) {
+			 dirName = dirName.replace("「", "");
+			 dirName = dirName.replace("」", " ");
+		 }
 		 
-		 getMissEvanSound(soundId, l.getDramaName()+"/lrc"+sountId, dirName);
+		 return dirName;
 	 }
 
 	 public static MissEvanSound getMaoerContenat(String sountId) throws Exception {
@@ -439,9 +562,9 @@ public class MissEvan {
 //		 System.out.println("===========SC文件下载start=============");
 //		 downSC(downloadPath, fileName, mSound);
 //		 System.out.println("===========SC文件下载success=============");
-		 System.out.println("===========伪剧本文件下载start=============");
+		 System.out.println("===========lrc文件下载start=============");
 		 downJB(downloadPath, fileName, soundId);
-		 System.out.println("===========伪剧本文件下载success=============");
+		 System.out.println("===========lrc文件下载success=============");
 //		 System.out.println("===========视频下载start=============");
 //		 downVideo(downloadPath, fileName, mSound);
 //		 System.out.println("===========视频下载success=============");
